@@ -1,0 +1,165 @@
+.header {
+  display: flex;
+  justify-content: center; /* Centers everything horizontally */
+  align-items: center; /* Centers everything vertically */
+  padding: 10px 20px;
+  color: #02439280;
+  font-weight: bold;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.logo {
+  width: 40px; /* Adjust this size as needed */
+  height: auto;
+  margin-right: 10px; /* Adds space between the logo and the text */
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: bold;
+  color: #061148;;
+}
+
+.homepage { 
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: #666565;
+  font-family: Arial, sans-serif;
+  justify-content: space-between; /* Centers the content vertically */
+  align-items: center; /* Centers the content horizontally */
+  overflow: hidden;
+  padding: 0;
+}
+
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: #f7f7f7;
+}
+
+.authForm {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.footer {
+  text-align: center;
+  width: 100%;
+  font-size: 14px;
+  color: #888;
+  padding: 10px 0; /* Add padding for better visibility */
+  background-color: #f0f0f0;
+  border-top: 1px solid #ddd;
+}
+
+.authForm h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.authForm input {
+  padding: 10px;
+  margin-bottom: 10px; /* Added margin to space out the inputs */
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.authForm input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.authForm button {
+  padding: 10px;
+  background: #061148;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.authForm button:hover {
+  background: #0056b3;
+}
+
+.authForm p {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.authForm p a {
+  cursor: pointer;
+  color: #061148;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.authForm p a:hover {
+  text-decoration: underline;
+}
+
+.error {
+  color: #021b3a80;
+  font-size: 15px;
+  margin-bottom: 10px;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+.error.hidden {
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .authForm {
+    padding: 20px;
+  }
+  .authForm input {
+    font-size: 14px;
+  }
+  .authForm button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .authContainer {
+    background-color: #fff;
+  }
+  .authForm {
+    background: #aaa;
+    color: #fff;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+  .authForm input {
+    background: #444;
+    color: #fff;
+    border-color: #555;
+    font-size: 12px;
+    font-weight: lighter;
+  }
+  .authForm button {
+    background: 0 0 4px #061148;
+  }
+}
