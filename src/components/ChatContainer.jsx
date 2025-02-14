@@ -8,6 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 import Dropzone from 'dropzone'; 
 import VoiceMode from "./VoiceMode"; 
 import brainlogo from '../assets/brainlogo.png';
+import { FaPlusCircle, FaMicrophone } from 'react-icons/fa';
 
 
 const ChatContainer = () => {
@@ -314,9 +315,16 @@ const handleDelete = async (chatId) => {
         {isSidebarVisible && (
           <div className={styles.chatSidebar}>
             <div className={styles.buttonContainer}>
-            <button onClick={handleNewChat} className={styles.newChatButton}>+ New Chat</button>
-            <button onClick={toggleVoiceMode} className={styles.voiceModeButton}>🎤 Voice Mode</button>
+              <button onClick={handleNewChat} className={styles.newChatButton}>
+              <span className={styles.buttonIcon}><FaPlusCircle /></span>
+                <span className={styles.tooltip}>New Chat</span>
+              </button>
+              <button onClick={toggleVoiceMode} className={styles.voiceModeButton}>
+                <span className={styles.buttonIcon}>< FaMicrophone /></span>
+                <span className={styles.tooltip}>Voice Mode</span>
+              </button>
             </div>
+
             <h3 className={styles.historyTitle}>History</h3>
             <div className={styles.chatHistory}>
               {[...chatHistory].reverse().slice(0, visibleChats).map((chat) => (

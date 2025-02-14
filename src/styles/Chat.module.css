@@ -35,28 +35,68 @@
 }
 
 .newChatButton, .voiceModeButton {
-  background-color: #444444;
+  background-color: transparent;
+  justify-content: center; 
   display: flex;
+  border: none;
   align-items: center;
   color: white;
-  padding: 15px 30px;
   border: none;
-  border-radius: 50px;
+  position: relative;
+  /* border-radius: 45px; */
   cursor: pointer;
-  font-size: 24px;
-  flex: 1; 
-  text-align: center; 
-  white-space: nowrap; 
-
+  /* max-width: 385px;
+  height: 50px; */
+  font-size: 32px;
+  margin-top: 0px;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.newChatButton:hover, .voiceModeButton:hover {
+.newChatButton:hover,
+.voiceModeButton:hover,
+.newChatButton:focus,
+.voiceModeButton:focus,
+.newChatButton:active,
+.voiceModeButton:active {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  transform: translateY(-50%);
   background-color: #333232;
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+  white-space: nowrap;
+  font-size: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.buttonIcon{
+  background-color: transparent;
+}
+
+.newChatButton:hover .tooltip,
+.voiceModeButton:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  
 }
 
 .buttonContainer {
   display: flex;
   justify-content: space-between; 
+  flex-direction: row;
   gap: 10px; 
   margin-bottom: 20px; 
 }
@@ -336,7 +376,8 @@
 
 .showMoreButton {
   background-color:#333232;
-  max-width: 400px;
+  max-width: 395px;
+  height: 50px;
   color: white;
   padding: 15px 30px;
   border: none;
@@ -511,7 +552,7 @@
     border: none;
     z-index: 1000;
     top: 0;
-    width: 80%;
+    width: 100%;
 }
 
 
@@ -536,6 +577,7 @@
     justify-content: flex-end; 
     position: relative;
     flex: 1;
+    gap: 10px;
   }
 
   .hamburgerMenu {
@@ -605,7 +647,7 @@
   
   .logo {
     height: 40px;
-    margin-right: 0px;
+    margin-right: 10px;
   }
   
   .brand {
@@ -679,7 +721,7 @@
     position: relative;
     align-items: center;
     z-index: 1;
-    /* overflow: hidden; */
+    color: white;
     justify-content: space-between;
     text-overflow: ellipsis;
     white-space: nowrap;
