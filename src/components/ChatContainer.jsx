@@ -37,7 +37,7 @@ const ChatContainer = () => {
   const [editingIndex, setEditingIndex] = useState(null); 
   const [editedMessage, setEditedMessage] = useState(""); 
   const [visibleChats, setVisibleChats] = useState(5);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
   const [isVoiceMode, setIsVoiceMode] = useState(false); 
   // const [chatMenuOpen, setChatMenuOpen] = useState(null); 
@@ -83,8 +83,8 @@ const ChatContainer = () => {
     const handleClickOutside = (event) => {
       if (
         chatMenuInfo &&
-        !event.target.closest(`.${styles.menuPopup}`) &&
-        !event.target.closest(`.${styles.menuButton}`)
+        !event.target.closest(`.${styles.chatHistoryItemMenuPopup}`) &&
+        !event.target.closest(`.${styles.chatHistoryItemMenuButton}`)
       ) {
         setChatMenuInfo(null);
       }
@@ -108,9 +108,13 @@ const ChatContainer = () => {
     );
   };
 
+  // const toggleSidebar = useCallback(() => {
+  //   setIsSidebarVisible(!isSidebarVisible);
+  // }, [isSidebarVisible]);
+
   const toggleSidebar = useCallback(() => {
-    setIsSidebarVisible(!isSidebarVisible);
-  }, [isSidebarVisible]);
+    setIsSidebarVisible((prev) => !prev);
+  }, []);
 
   const handleChatSelection = useCallback(
     async (selectedChatId) => {
@@ -296,7 +300,7 @@ const handleDelete = async (chatId) => {
           </div>
           {/* Pop-up Menu */}
           {menuOpen && (
-            <div className={styles.popupMenu}>
+            <div className={styles.userBottonPopupMenu}>
               <button onClick={() => alert("Profile Clicked")}>Profile</button>
               <button onClick={() => alert("Settings Clicked")}>Settings</button>
               <LogoutButton />
@@ -314,7 +318,10 @@ const handleDelete = async (chatId) => {
       <div className={styles.container}>
         {isSidebarVisible && (
           <div className={styles.chatSidebar}>
-            <div className={styles.buttonContainer}>
+            <button onClick={toggleSidebar} className={styles.closeButton}>
+                ×
+            </button>
+            <div className={styles.newChatVoiceModeButtonContainer}>
               <button onClick={handleNewChat} className={styles.newChatButton}>
               <span className={styles.buttonIcon}><FaPlusCircle /></span>
                 <span className={styles.tooltip}>New Chat</span>
@@ -353,7 +360,7 @@ const handleDelete = async (chatId) => {
                             }
                           }}
                           autoFocus
-                          className={styles.renameInput}
+                          className={styles.renameChatInput}
                       />
                   ) : (
                     <span onClick={() => handleChatSelection(chat.id)}>
@@ -361,7 +368,7 @@ const handleDelete = async (chatId) => {
                     </span>
                   )}
                   <button
-                          className={styles.menuButton}
+                          className={styles.chatHistoryItemMenuButton}
                           onClick={(e) => {
                             e.stopPropagation();
                             e.currentTarget.blur();
@@ -433,13 +440,13 @@ const handleDelete = async (chatId) => {
                   }}
                 />
                 <button
-                  className={styles.saveButton}
+                  className={styles.saveEditButton}
                   onClick={() => handleSaveEdit(index)}
                 >
                   Send
                 </button>
                 <button
-                  className={styles.cancelButton}
+                  className={styles.cancelEditButton}
                   onClick={() => setEditingIndex(null)}
                 >
                   Cancel
@@ -514,7 +521,7 @@ const handleDelete = async (chatId) => {
                   <span className={styles.fileName}>{file.name}</span>
                   <button 
                     type="button" 
-                    className={styles.clearButton}
+                    className={styles.clearFileButton}
                     onClick={removeFile}
                     aria-label="Remove file"
                   >
@@ -536,7 +543,7 @@ const handleDelete = async (chatId) => {
 
       {chatMenuInfo && (
             <div
-              className={styles.menuPopup}
+              className={styles.chatHistoryItemMenuPopup}
               style={{
                 position: "fixed",
                 top: chatMenuInfo.y,

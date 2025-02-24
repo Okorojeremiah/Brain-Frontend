@@ -6,7 +6,7 @@ import axios from "../api";
 
 
 
-const VoiceMode = ({ toggleVoiceMode, currentChatId }) => {
+const VoiceMode = ({ toggleVoiceMode, currentChatId = 'null'}) => {
     const [isConversationActive, setIsConversationActive] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [audioUrl, setAudioUrl] = useState("");
@@ -154,8 +154,5 @@ const VoiceMode = ({ toggleVoiceMode, currentChatId }) => {
     currentChatId: PropTypes.number,
   };
   
-  VoiceMode.defaultProps = {
-    currentChatId: null,
-  };
   
 export default VoiceMode;
