@@ -1,0 +1,21 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#2a2a2a" />
+  
+  <!-- Simplified Brain Illustration -->
+  <g fill="#ffffff" stroke="#000000" stroke-width="3">
+    <!-- Left Hemisphere -->
+    <path d="M150,100 
+             C120,80 90,120 90,150 
+             C90,180 120,220 150,200 
+             C130,180 130,140 150,100 Z" />
+    <!-- Right Hemisphere -->
+    <path d="M250,100 
+             C280,80 310,120 310,150 
+             C310,180 280,220 250,200 
+             C270,180 270,140 250,100 Z" />
+    <!-- Connecting curve between hemispheres -->
+    <path d="M150,150 
+             C180,160 220,160 250,150" fill="none" />
+  </g>
+</svg>

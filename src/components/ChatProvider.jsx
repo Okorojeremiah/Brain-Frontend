@@ -10,9 +10,62 @@ export const ChatProvider = ({ children }) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
 
+  
+  const loadChat = useCallback(async (chatId) => {
+    try {
+      const response = await axios.get(`/user/chat_history/${chatId}`);
+      setMessages(response.data.messages);
+      console.log("Loaded messages:", response.data.messages);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.details ||
+        "Failed to load chat messages.";
+      console.error("Failed to load chat messages:", errorMessage);
+    }
+  }, []);
+
   useEffect(() => {
     fetchHistory();
   }, []);
+
+  useEffect(() => {
+    const fetchCurrentChatId = async () => {
+      try {
+        const response = await axios.get("/user/chat/current");
+        
+        if (response.data.chatId) {
+          setCurrentChatId(response.data.chatId);
+        }
+      } catch (error) {
+        console.error("Failed to fetch current chat ID:", error);
+      }
+    };
+
+    fetchCurrentChatId();
+  }, []);
+
+  useEffect(() => {
+    const updateCurrentChatId = async () => {
+      console.log("A Fetched current chat ID:", currentChatId);
+      if (currentChatId) {
+        try {
+          await axios.post("/user/chat/set_current", { chatId: currentChatId });
+        } catch (error) {
+          console.error("Failed to update current chat ID:", error);
+        }
+      }
+    };
+
+    updateCurrentChatId();
+  }, [currentChatId]);
+
+  useEffect(() => {
+    if (currentChatId) {
+      console.log("Loading chat for ID:", currentChatId);
+      loadChat(currentChatId);
+    }
+  }, [currentChatId, loadChat]);
 
   const fetchHistory = async () => {
     try {
@@ -32,20 +85,6 @@ export const ChatProvider = ({ children }) => {
       console.error("Failed to fetch chat history:", errorMessage);
     }
   };
-
-  const loadChat = useCallback(async (chatId) => {
-    try {
-      const response = await axios.get(`/user/chat_history/${chatId}`);
-      setMessages(response.data.messages);
-      console.log(response.data.messages);
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        error.response?.data?.details ||
-        "Failed to load chat messages.";
-      console.error("Failed to load chat messages:", errorMessage);
-    }
-  }, []);
 
   const sendMessage = async (chatId, userInput) => {
     const userMessage = { sender: "User", content: userInput };
@@ -129,6 +168,56 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
+  // const updateMessage = async (index, messageId, newMessage) => {
+  //   try {
+  //     // Send a PUT request to update the message
+  //     const assistantResponse = await axios.put("/user/chat/messages/update", {
+  //       messageId: messageId, // Pass the message ID to the backend
+  //       newContent: newMessage, // Pass the new content to the backend
+  //     }); 
+
+  //     console.log(assistantResponse.data?.answer)
+  
+  //     // Update the message list with the new content
+  //     setMessages((prevMessages) => {
+  //       const updatedMessages = [...prevMessages];
+  //       updatedMessages[index] = {
+  //         ...updatedMessages[index],
+  //         content: newMessage,
+  //         edits: [...(updatedMessages[index].edits || []), updatedMessages[index].content], // Save previous content
+  //         editCount: (updatedMessages[index].editCount || 0) + 1, // Increment edit count
+  //       };
+  //       return updatedMessages;
+  //     });
+
+  //     // const assistantResponse = await axios.post("/user/chat/messages", {
+  //     //   chat_id: chatId,
+  //     //   user_message: newMessage, 
+  //     // });
+
+  //     setMessages((prevMessages) => {
+  //       const updatedMessages = [...prevMessages];
+  //       const assistantMessageIndex = index + 1; // Assistant response is usually right after the user's message
+  //       if (updatedMessages[assistantMessageIndex]?.sender === "Brain") {
+  //         updatedMessages[assistantMessageIndex] = {
+  //           ...updatedMessages[assistantMessageIndex],
+  //           content: assistantResponse.data?.answer || "No response available.",
+  //           edits: [...(updatedMessages[assistantMessageIndex].edits || []), updatedMessages[assistantMessageIndex].content],
+  //           editCount: (updatedMessages[assistantMessageIndex].editCount || 0) + 1,
+  //         };
+  //       }
+  //       return updatedMessages;
+  //     });
+
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error.response?.data?.error ||
+  //       error.response?.data?.details ||
+  //       "Error updating message";
+  //     console.error("Error updating message:", errorMessage);
+  //   }
+  // };
+
   const deleteChat = async (chatId) => {
     try {
       await axios.delete(`/user/chat_history/delete_chat/${chatId}`);
@@ -155,18 +244,31 @@ export const ChatProvider = ({ children }) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-
-      const response = await axios.post("documents/upload", formData, {
+  
+      // Fetch the user's profile to check if they are a superuser and get their department
+      const userProfileResponse = await axios.get("/user/profile");
+      const isSuperuser = userProfileResponse.data?.is_superuser || false;
+      const userDepartment = userProfileResponse.data?.department || "";
+  
+      // Determine the API endpoint based on the user's role
+      const endpoint = isSuperuser ? "documents/admin/upload" : "documents/upload";
+  
+      // Add the user's department to the form data (for superusers only)
+      if (isSuperuser) {
+        formData.append("department", userDepartment);
+      }
+  
+      const response = await axios.post(endpoint, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
+  
       const uploadedFileMessage = {
         sender: "User",
         content: `File uploaded: ${response.data.file_name}`,
       };
-
+  
       setMessages((prev) => [...prev, uploadedFileMessage]);
     } catch (error) {
       const errorMessage =

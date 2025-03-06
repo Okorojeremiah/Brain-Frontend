@@ -1,0 +1,105 @@
+/* src/styles/Feedback.module.css */
+
+.feedbackContainer {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative; /* Add this for the close button */
+}
+
+.feedbackTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.feedbackForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center; /* Center the form items horizontally */
+}
+
+.feedbackTextarea {
+    width: 100%; /* Make the textarea take full width of its container */
+    height: 150px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.feedbackTextarea:focus {
+    border-color: #007bff;
+}
+
+.feedbackButton {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Make the button take full width */
+    max-width: 200px; /* Limit the button width */
+}
+
+.feedbackButton:hover {
+    background-color: #0056b3;
+}
+
+.feedbackButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.feedbackSuccessMessage {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #e6f7ff;
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    color: #007bff;
+    text-align: center;
+    font-size: 14px;
+    width: 100%; /* Make the message take full width */
+}
+
+.feedbackErrorMessage {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #fff5f5;
+    border: 1px solid #ff4d4f;
+    border-radius: 8px;
+    color: #ff4d4f;
+    text-align: center;
+    font-size: 14px;
+    width: 100%; /* Make the message take full width */
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333333;
+}
+
+.closeButton:hover {
+    color: #007bff;
+}

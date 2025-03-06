@@ -8,9 +8,30 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [department, setDepartment] = useState("");
   const [jobRole, setJobRole] = useState(""); 
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const departments = [
+    "admin",
+    "hr",
+    "it",
+    "reconciliation",
+    "marketing",
+    "transformation",
+    "communication",
+    "internal_operation",
+    "legal",
+    "account",
+    "portfolio_risk",
+    "underwriter",
+    "business_operation",
+    "client_experience",
+    "recovery",
+    "product",
+    "sales",
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,10 +42,11 @@ const Register = () => {
         name: name,
         email: email,
         password: password,
+        department: department,
         job_role: jobRole, 
       });
 
-      if (response.status === 201) { // 201 indicates successful creation
+      if (response.status === 201) { 
         navigate("/login");
       } else {
         setError(response.data.error || "Registration failed. Please try again.");
@@ -66,6 +88,21 @@ const Register = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <select
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+          required
+          className={styles.authFormInput} // Add this class for consistent styling
+        >
+          <option value="" disabled>
+            Select Department
+          </option>
+          {departments.map((dept) => (
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
           placeholder="Job Role"

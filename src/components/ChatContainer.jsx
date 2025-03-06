@@ -7,8 +7,10 @@ import LogoutButton from "../Auth/Logout"
 import { AuthContext } from "../context/AuthContext";
 import Dropzone from 'dropzone'; 
 import VoiceMode from "./VoiceMode"; 
-import brainlogo from '../assets/brainlogo.png';
+import brain from '../assets/brain.svg';
+import Feedback from "./FeedBack";
 import { FaPlusCircle, FaMicrophone } from 'react-icons/fa';
+// import AssistantMessage from "./AssistantMessage";
 
 
 const ChatContainer = () => {
@@ -40,12 +42,39 @@ const ChatContainer = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
   const [isVoiceMode, setIsVoiceMode] = useState(false); 
-  // const [chatMenuOpen, setChatMenuOpen] = useState(null); 
+  const [theme, setTheme] = useState("light");
   const [chatMenuInfo, setChatMenuInfo] = useState(null);
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState("");
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showTrendsPopup, setShowTrendsPopup] = useState(false); 
+  const trendsButtonRef = useRef(null);
 
   
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const newTheme = prev === "light" ? "dark" : "light";
+      localStorage.setItem('theme', newTheme);  // Save to localStorage
+      return newTheme;
+    });
+  };
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      setTheme(storedTheme); 
+    }
+  }, []); 
+
+  const handleTrendsButtonClick = () => {
+    setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
+  };
+
+  // Function to handle trend selection
+  const handleTrendSelection = (trend) => {
+    console.log(`Selected trend: ${trend}`); // Replace with your logic
+    setShowTrendsPopup(false); // Close the popup after selection
+  };
 
   const userFullName =  user ? user.name : "User"; 
   const userFirstName = userFullName.split(" ")[0]; 
@@ -66,18 +95,6 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (chatMenuOpen && !event.target.closest(`.${styles.chatHistoryItem}`)) {
-  //       setChatMenuOpen(null);
-  //     }
-  //   };
-  
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside);
-  //   };
-  // }, [chatMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -97,6 +114,24 @@ const ChatContainer = () => {
   }, [chatMenuInfo]);
 
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        trendsButtonRef.current &&
+        !trendsButtonRef.current.contains(event.target) &&
+        !event.target.closest(`.${styles.trendsPopup}`)
+      ) {
+        setShowTrendsPopup(false); // Close the popup
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   const toggleVoiceMode = () => {
     setIsVoiceMode((prev) => !prev);
   };
@@ -108,9 +143,6 @@ const ChatContainer = () => {
     );
   };
 
-  // const toggleSidebar = useCallback(() => {
-  //   setIsSidebarVisible(!isSidebarVisible);
-  // }, [isSidebarVisible]);
 
   const toggleSidebar = useCallback(() => {
     setIsSidebarVisible((prev) => !prev);
@@ -253,6 +285,24 @@ const handleDelete = async (chatId) => {
     setEditedMessage(message); 
   };
 
+  // const handleSaveEdit = async (index) => {
+  //   if (editedMessage.trim()) {
+  //     try {
+  //       if (!messages[index].id) {
+  //         throw new Error("Message ID is missing.");
+  //       }
+
+  //       await updateMessage(index, messages[index].id, editedMessage.trim()); 
+  //       setEditingIndex(null); 
+  //       setEditedMessage(""); 
+  //     } catch (error) {
+  //       console.error("Error updating message:", error);
+  //     }
+  //   } else {
+  //     alert("Edited message cannot be empty.");
+  //   }
+  // };
+
   const handleSaveEdit = async (index) => {
     if (editedMessage.trim()) {
       try {
@@ -267,6 +317,90 @@ const handleDelete = async (chatId) => {
     }
   };
 
+  
+  // const renderMessages = () => {
+  //   return messages.map((msg, index) => (
+  //     <div
+  //       key={index}
+  //       className={
+  //         msg.sender === "User" ? styles.userMessage : styles.assistantMessage
+  //       }
+  //     >
+  //       {msg.sender === "User" && (
+  //         <button
+  //           className={styles.editButton}
+  //           onClick={() => handleEditClick(index, msg.content)}
+  //           aria-label="Edit message"
+  //         >
+  //           <span className="material-icons">edit</span>
+  //         </button>
+  //       )}
+  //       {editingIndex === index ? (
+  //         <div className={styles.editMessageContainer}>
+  //           <textarea
+  //             className={styles.editInput}
+  //             value={editedMessage}
+  //             onChange={(e) => setEditedMessage(e.target.value)}
+  //             rows="2"
+  //             style={{ resize: "none", overflowY: "auto" }}
+  //             onKeyDown={(e) => {
+  //               if (e.key === "Enter" && !e.shiftKey) {
+  //                 e.preventDefault();
+  //                 handleSaveEdit(index);
+  //               }
+  //             }}
+  //             onInput={(e) => {
+  //               e.target.style.height = "auto";
+  //               const maxHeight = 400;
+  //               e.target.style.height = `${Math.min(
+  //                 e.target.scrollHeight,
+  //                 maxHeight
+  //               )}px`;
+  //             }}
+  //           />
+  //           <button
+  //             className={styles.saveEditButton}
+  //             onClick={() => handleSaveEdit(index)}
+  //           >
+  //             Send
+  //           </button>
+  //           <button
+  //             className={styles.cancelEditButton}
+  //             onClick={() => setEditingIndex(null)}
+  //           >
+  //             Cancel
+  //           </button>
+  //         </div>
+  //       ) : msg.sender === "Brain" ? (
+  //         <AssistantMessage message={msg} />
+  //       ) : (
+  //         <>
+  //           <ReactMarkdown>
+  //             {typeof msg?.content === "string"
+  //               ? DOMPurify.sanitize(msg.content)
+  //               : ""}
+  //           </ReactMarkdown>
+  //           {msg.sender === "Brain" && (
+  //             <button
+  //               className={styles.copyButton}
+  //               onClick={() => handleCopy(msg.content, index)}
+  //               aria-label="Copy message"
+  //             >
+  //               <span className="material-icons">
+  //                 {copiedIndex === index ? "check_circle" : "content_copy"}
+  //               </span>
+  //             </button>
+  //           )}
+  //           {copiedIndex === index && (
+  //             <div className={styles.copiedMessage}>Copied!</div>
+  //           )}
+  //         </>
+  //       )}
+  //     </div>
+  //   ));
+  // };
+
+
 
   const removeFile = () => {
     setFile(null);
@@ -277,7 +411,7 @@ const handleDelete = async (chatId) => {
   };
 
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} ${styles[theme]}`}>
       {isVoiceMode ? (
                 <VoiceMode 
                 toggleVoiceMode={toggleVoiceMode}
@@ -290,8 +424,8 @@ const handleDelete = async (chatId) => {
         width: isSidebarVisible ? 'calc(100% - 20%)' : '100%'
       }}>
       <div className={styles.headerLeft}>
-        <img src={brainlogo} alt="Logo" className={styles.logo} />
-        <div className={styles.brand}>Brain<sup>™</sup></div>
+        <div className={styles.brand}>Brain</div>
+        <img src={brain} alt="Logo" className={styles.logo} />
       </div>
       <div className={styles.headerRight}>
         <div className={styles.userMenuContainer}>
@@ -302,7 +436,7 @@ const handleDelete = async (chatId) => {
           {menuOpen && (
             <div className={styles.userBottonPopupMenu}>
               <button onClick={() => alert("Profile Clicked")}>Profile</button>
-              <button onClick={() => alert("Settings Clicked")}>Settings</button>
+              <button onClick={toggleTheme}>Toggle Theme (Current: {theme})</button>
               <LogoutButton />
             </div>
           )}
@@ -317,7 +451,7 @@ const handleDelete = async (chatId) => {
 
       <div className={styles.container}>
         {isSidebarVisible && (
-          <div className={styles.chatSidebar}>
+          <div className={`${styles.chatSidebar} ${styles.visible}`}>
             <button onClick={toggleSidebar} className={styles.closeButton}>
                 ×
             </button>
@@ -331,7 +465,42 @@ const handleDelete = async (chatId) => {
                 <span className={styles.tooltip}>Voice Mode</span>
               </button>
             </div>
+            <button
+              onClick={() => setShowFeedbackModal(true)}
+              className={`${styles.leaveAFeedBackButton} ${showFeedbackModal ? styles.active : ""}`}
+              style={{ width: "100%" }}
+            >
+              Leave Feedback
+            </button>
+            <button
+              ref={trendsButtonRef} 
+              onClick={handleTrendsButtonClick}
+              className={`${styles.checkTrendsButton} ${showTrendsPopup ? styles.active : ""}`}
+              style={{ width: "100%" }}
+            >
+              Check Trends
+            </button>
 
+            {/* Trends Popup Menu */}
+            {showTrendsPopup && (
+             <div
+             className={styles.trendsPopup}
+            //  style={{
+            //    position: "fixed",
+            //    top: trendsButtonRef.current
+            //      ? trendsButtonRef.current.getBoundingClientRect().bottom + 5
+            //      : "auto",
+            //    left: trendsButtonRef.current
+            //      ? trendsButtonRef.current.getBoundingClientRect().left
+            //      : "auto",
+            //  }}
+              >
+                <button onClick={() => handleTrendSelection("Finance")}>Finance</button>
+                <button onClick={() => handleTrendSelection("Career Trends")}>Career Trends</button>
+                <button onClick={() => handleTrendSelection("Trending Courses")}>Trending Courses</button>
+                <button onClick={() => handleTrendSelection("General News")}>General News</button>
+              </div>
+            )}
             <h3 className={styles.historyTitle}>History</h3>
             <div className={styles.chatHistory}>
               {[...chatHistory].reverse().slice(0, visibleChats).map((chat) => (
@@ -398,11 +567,11 @@ const handleDelete = async (chatId) => {
         <div className={styles.mainChat}>
                   {showWelcomeMessage && (
             <div className={styles.welcomeMessage}>
-              <strong>Welcome {userFirstName}, chat with Brain<sup>™</sup></strong>
+              <strong>Welcome {userFirstName}, chat with Brain</strong>
             </div>
           )}
           <div className={styles.messages}>
-            {messages.map((msg, index) => (
+          {messages.map((msg, index) => (
               <div
                 key={index}
                 className={
@@ -485,7 +654,7 @@ const handleDelete = async (chatId) => {
           </div>
           <form className={styles.chatInputForm} onSubmit={handleSubmit}>
           <div className={styles.inputWrapper}>
-          <label htmlFor="fileInput" className={styles.uploadButton}>
+          <label htmlFor="fileInput" className={styles.uploadButton} title='upload ".pdf, .pptx, .docx, .xlxs, .xls files only. File size should be less than 1.6MB'>
               <span className="material-icons">attach_file</span>
             </label>
           <textarea  
@@ -536,6 +705,7 @@ const handleDelete = async (chatId) => {
               ref={fileInputRef}
               style={{ display: "none" }}
               onChange={handleFileChange}
+              accept=".pdf,.pptx,.docx,.xlxs,.xls" 
             />
           </form>
         </div>
@@ -567,6 +737,13 @@ const handleDelete = async (chatId) => {
               >
                 <span className="material-icons">delete</span> Delete
               </button>
+            </div>
+          )}
+          {showFeedbackModal && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modalContent}>
+                <Feedback onClose={() => setShowFeedbackModal(false)} />
+              </div>
             </div>
           )}
         </>

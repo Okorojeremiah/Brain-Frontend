@@ -76,10 +76,26 @@
 
 .authForm input {
   padding: 10px;
-  margin-bottom: 10px; /* Added margin to space out the inputs */
+  margin-bottom: 10px; 
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+.authFormInput {
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #888;
+}
+
+.authFormInput:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
 }
 
 .authForm input:focus {
