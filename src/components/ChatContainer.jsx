@@ -4,17 +4,20 @@ import DOMPurify from "dompurify";
 import { ChatContext } from "../context/ChatContext";
 import styles from "../styles/Chat.module.css";
 import LogoutButton from "../Auth/Logout"
-import { AuthContext } from "../context/AuthContext";
+// import { AuthContext } from "../context/AuthContext";
 import Dropzone from 'dropzone'; 
 import VoiceMode from "./VoiceMode"; 
 import brain from '../assets/brain.svg';
 import Feedback from "./FeedBack";
 import { FaPlusCircle, FaMicrophone } from 'react-icons/fa';
+import Profile from "./Profile";
+import { useTheme } from "../context/ThemeContext.jsx";
+import { useAuth } from "../Auth/AuthProvider.jsx";
 // import AssistantMessage from "./AssistantMessage";
 
 
 const ChatContainer = () => {
-  const { user } = useContext(AuthContext); 
+  const { user } = useAuth(); 
   const { 
     messages, 
     chatHistory, 
@@ -42,29 +45,16 @@ const ChatContainer = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
   const [isVoiceMode, setIsVoiceMode] = useState(false); 
-  const [theme, setTheme] = useState("light");
+  const { theme } = useTheme();
   const [chatMenuInfo, setChatMenuInfo] = useState(null);
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState("");
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showTrendsPopup, setShowTrendsPopup] = useState(false); 
   const trendsButtonRef = useRef(null);
+  const [showProfile, setShowProfile] = useState(false);
 
   
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const newTheme = prev === "light" ? "dark" : "light";
-      localStorage.setItem('theme', newTheme);  // Save to localStorage
-      return newTheme;
-    });
-  };
-
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      setTheme(storedTheme); 
-    }
-  }, []); 
 
   const handleTrendsButtonClick = () => {
     setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
@@ -72,7 +62,7 @@ const ChatContainer = () => {
 
   // Function to handle trend selection
   const handleTrendSelection = (trend) => {
-    console.log(`Selected trend: ${trend}`); // Replace with your logic
+    console.log(`Selected trend: ${trend}`); 
     setShowTrendsPopup(false); // Close the popup after selection
   };
 
@@ -410,6 +400,11 @@ const handleDelete = async (chatId) => {
     setMenuOpen((prev) => !prev); 
   };
 
+  const handleProfileClick = () => {
+    setShowProfile(true);
+    setMenuOpen(false);
+  };
+
   return (
     <div className={`${styles.app} ${styles[theme]}`}>
       {isVoiceMode ? (
@@ -435,8 +430,8 @@ const handleDelete = async (chatId) => {
           {/* Pop-up Menu */}
           {menuOpen && (
             <div className={styles.userBottonPopupMenu}>
-              <button onClick={() => alert("Profile Clicked")}>Profile</button>
-              <button onClick={toggleTheme}>Toggle Theme (Current: {theme})</button>
+              <button onClick={handleProfileClick}>Profile</button>
+              {/* <button onClick={toggleTheme}>Toggle Theme (Current: {theme})</button> */}
               <LogoutButton />
             </div>
           )}
@@ -448,7 +443,11 @@ const handleDelete = async (chatId) => {
         <div></div>
       </button>
     </header>
-
+        {showProfile && (
+          <div className={styles.modalOverlay}>
+            <Profile onClose={() => setShowProfile(false)} />
+          </div>
+        )}
       <div className={styles.container}>
         {isSidebarVisible && (
           <div className={`${styles.chatSidebar} ${styles.visible}`}>
