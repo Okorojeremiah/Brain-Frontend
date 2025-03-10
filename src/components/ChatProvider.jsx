@@ -141,22 +141,41 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  const updateMessage = async (index, chatId, newMessage) => {
-    const messageData = { chat_id: chatId, user_message: newMessage };
-    try {
-      const response = await axios.post("/user/chat/messages", messageData);
+  const updateMessage = async (userMessageIndex, chatId, newContent) => {
+    const userMessage = messages[userMessageIndex];
+    const aiMessage = messages[userMessageIndex + 1];
 
-      // Update the message list with the new response
+    if (!userMessage || !aiMessage) {
+      console.error("Unable to find corresponding messages for update.");
+      return;
+    }
+
+    try {
+      const response = await axios.put("/user/chat/messages/update_full", {
+        userMessageId: userMessage.id,
+        aiMessageId: aiMessage.id,
+        newContent,
+      });
+
+      // The response is expected to have updated_user_message and updated_ai_message.
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
-        updatedMessages[index] = {
-          ...updatedMessages[index],
-          content: newMessage,
+        // Update the user message at the given index.
+        updatedMessages[userMessageIndex] = {
+          ...updatedMessages[userMessageIndex],
+          content: response.data.updated_user_message.content,
+          edits: response.data.updated_user_message.edits,
+          edit_count: response.data.updated_user_message.edit_count,
+          timestamp: response.data.updated_user_message.timestamp,
         };
-        updatedMessages.push({
-          sender: "Brain",
-          content: response.data?.answer,
-        });
+        // Update the corresponding AI message (assumed to be at index + 1).
+        updatedMessages[userMessageIndex + 1] = {
+          ...updatedMessages[userMessageIndex + 1],
+          content: response.data.updated_ai_message.content,
+          edits: response.data.updated_ai_message.edits,
+          edit_count: response.data.updated_ai_message.edit_count,
+          timestamp: response.data.updated_ai_message.timestamp,
+        };
         return updatedMessages;
       });
     } catch (error) {
@@ -168,56 +187,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // const updateMessage = async (index, messageId, newMessage) => {
-  //   try {
-  //     // Send a PUT request to update the message
-  //     const assistantResponse = await axios.put("/user/chat/messages/update", {
-  //       messageId: messageId, // Pass the message ID to the backend
-  //       newContent: newMessage, // Pass the new content to the backend
-  //     }); 
-
-  //     console.log(assistantResponse.data?.answer)
   
-  //     // Update the message list with the new content
-  //     setMessages((prevMessages) => {
-  //       const updatedMessages = [...prevMessages];
-  //       updatedMessages[index] = {
-  //         ...updatedMessages[index],
-  //         content: newMessage,
-  //         edits: [...(updatedMessages[index].edits || []), updatedMessages[index].content], // Save previous content
-  //         editCount: (updatedMessages[index].editCount || 0) + 1, // Increment edit count
-  //       };
-  //       return updatedMessages;
-  //     });
-
-  //     // const assistantResponse = await axios.post("/user/chat/messages", {
-  //     //   chat_id: chatId,
-  //     //   user_message: newMessage, 
-  //     // });
-
-  //     setMessages((prevMessages) => {
-  //       const updatedMessages = [...prevMessages];
-  //       const assistantMessageIndex = index + 1; // Assistant response is usually right after the user's message
-  //       if (updatedMessages[assistantMessageIndex]?.sender === "Brain") {
-  //         updatedMessages[assistantMessageIndex] = {
-  //           ...updatedMessages[assistantMessageIndex],
-  //           content: assistantResponse.data?.answer || "No response available.",
-  //           edits: [...(updatedMessages[assistantMessageIndex].edits || []), updatedMessages[assistantMessageIndex].content],
-  //           editCount: (updatedMessages[assistantMessageIndex].editCount || 0) + 1,
-  //         };
-  //       }
-  //       return updatedMessages;
-  //     });
-
-  //   } catch (error) {
-  //     const errorMessage =
-  //       error.response?.data?.error ||
-  //       error.response?.data?.details ||
-  //       "Error updating message";
-  //     console.error("Error updating message:", errorMessage);
-  //   }
-  // };
-
   const deleteChat = async (chatId) => {
     try {
       await axios.delete(`/user/chat_history/delete_chat/${chatId}`);

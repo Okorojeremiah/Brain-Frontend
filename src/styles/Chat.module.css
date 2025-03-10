@@ -937,6 +937,30 @@ input:checked + .slider:before {
   visibility: hidden;
 }
 
+.versionNavigation {
+  margin-top: 8px; 
+  text-align: center;
+  font-size: 1rem;
+}
+
+.versionNavigation button {
+  border: none;       
+  background: none;   
+  padding: 0 5px;     
+  cursor: pointer;
+  font-size: inherit; 
+}
+
+.versionNavigation button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.versionIndicator {
+  margin: 0 5px;
+  vertical-align: middle;
+}
+
 .typingIndicator {
   margin-right: auto;
   text-align: left;

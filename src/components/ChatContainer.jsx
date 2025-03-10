@@ -53,25 +53,24 @@ const ChatContainer = () => {
   const [showTrendsPopup, setShowTrendsPopup] = useState(false); 
   const trendsButtonRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
-
+  const [versionIndices, setVersionIndices] = useState({});
   
 
-  const handleTrendsButtonClick = () => {
-    setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
+
+  const getMessageHistory = (msg) => {
+    const edits = msg.edits && Array.isArray(msg.edits) ? msg.edits.map(e => e.content) : [];
+    return [...edits, msg.content];
   };
 
-  // Function to handle trend selection
-  const handleTrendSelection = (trend) => {
-    console.log(`Selected trend: ${trend}`); 
-    setShowTrendsPopup(false); // Close the popup after selection
-  };
-
-  const userFullName =  user ? user.name : "User"; 
-  const userFirstName = userFullName.split(" ")[0]; 
-  const userInitials = userFullName
-    .split(" ")
-    .map((name) => name[0])
-    .join(""); 
+  useEffect(() => {
+    const newIndices = {};
+    messages.forEach((msg) => {
+      // If we haven't set an index for this message, default to the latest version.
+      const history = getMessageHistory(msg);
+      newIndices[msg.id] = newIndices[msg.id] || history.length - 1;
+    });
+    setVersionIndices(newIndices);
+  }, [messages]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -103,7 +102,7 @@ const ChatContainer = () => {
     };
   }, [chatMenuInfo]);
 
-
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -120,6 +119,17 @@ const ChatContainer = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+
+  const handleTrendsButtonClick = () => {
+    setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
+  };
+
+  // Function to handle trend selection
+  const handleTrendSelection = (trend) => {
+    console.log(`Selected trend: ${trend}`); 
+    setShowTrendsPopup(false); // Close the popup after selection
+  };
 
 
   const toggleVoiceMode = () => {
@@ -275,23 +285,6 @@ const handleDelete = async (chatId) => {
     setEditedMessage(message); 
   };
 
-  // const handleSaveEdit = async (index) => {
-  //   if (editedMessage.trim()) {
-  //     try {
-  //       if (!messages[index].id) {
-  //         throw new Error("Message ID is missing.");
-  //       }
-
-  //       await updateMessage(index, messages[index].id, editedMessage.trim()); 
-  //       setEditingIndex(null); 
-  //       setEditedMessage(""); 
-  //     } catch (error) {
-  //       console.error("Error updating message:", error);
-  //     }
-  //   } else {
-  //     alert("Edited message cannot be empty.");
-  //   }
-  // };
 
   const handleSaveEdit = async (index) => {
     if (editedMessage.trim()) {
@@ -307,91 +300,22 @@ const handleDelete = async (chatId) => {
     }
   };
 
+  const handleVersionBack = (msgId) => {
+    setVersionIndices((prev) => {
+      const currentIndex = prev[msgId] || 0;
+      const newIndex = Math.max(currentIndex - 1, 0);
+      return { ...prev, [msgId]: newIndex };
+    });
+  };
+
+  const handleVersionForward = (msgId, historyLength) => {
+    setVersionIndices((prev) => {
+      const currentIndex = prev[msgId] || historyLength - 1;
+      const newIndex = Math.min(currentIndex + 1, historyLength - 1);
+      return { ...prev, [msgId]: newIndex };
+    });
+  };
   
-  // const renderMessages = () => {
-  //   return messages.map((msg, index) => (
-  //     <div
-  //       key={index}
-  //       className={
-  //         msg.sender === "User" ? styles.userMessage : styles.assistantMessage
-  //       }
-  //     >
-  //       {msg.sender === "User" && (
-  //         <button
-  //           className={styles.editButton}
-  //           onClick={() => handleEditClick(index, msg.content)}
-  //           aria-label="Edit message"
-  //         >
-  //           <span className="material-icons">edit</span>
-  //         </button>
-  //       )}
-  //       {editingIndex === index ? (
-  //         <div className={styles.editMessageContainer}>
-  //           <textarea
-  //             className={styles.editInput}
-  //             value={editedMessage}
-  //             onChange={(e) => setEditedMessage(e.target.value)}
-  //             rows="2"
-  //             style={{ resize: "none", overflowY: "auto" }}
-  //             onKeyDown={(e) => {
-  //               if (e.key === "Enter" && !e.shiftKey) {
-  //                 e.preventDefault();
-  //                 handleSaveEdit(index);
-  //               }
-  //             }}
-  //             onInput={(e) => {
-  //               e.target.style.height = "auto";
-  //               const maxHeight = 400;
-  //               e.target.style.height = `${Math.min(
-  //                 e.target.scrollHeight,
-  //                 maxHeight
-  //               )}px`;
-  //             }}
-  //           />
-  //           <button
-  //             className={styles.saveEditButton}
-  //             onClick={() => handleSaveEdit(index)}
-  //           >
-  //             Send
-  //           </button>
-  //           <button
-  //             className={styles.cancelEditButton}
-  //             onClick={() => setEditingIndex(null)}
-  //           >
-  //             Cancel
-  //           </button>
-  //         </div>
-  //       ) : msg.sender === "Brain" ? (
-  //         <AssistantMessage message={msg} />
-  //       ) : (
-  //         <>
-  //           <ReactMarkdown>
-  //             {typeof msg?.content === "string"
-  //               ? DOMPurify.sanitize(msg.content)
-  //               : ""}
-  //           </ReactMarkdown>
-  //           {msg.sender === "Brain" && (
-  //             <button
-  //               className={styles.copyButton}
-  //               onClick={() => handleCopy(msg.content, index)}
-  //               aria-label="Copy message"
-  //             >
-  //               <span className="material-icons">
-  //                 {copiedIndex === index ? "check_circle" : "content_copy"}
-  //               </span>
-  //             </button>
-  //           )}
-  //           {copiedIndex === index && (
-  //             <div className={styles.copiedMessage}>Copied!</div>
-  //           )}
-  //         </>
-  //       )}
-  //     </div>
-  //   ));
-  // };
-
-
-
   const removeFile = () => {
     setFile(null);
   };
@@ -404,6 +328,14 @@ const handleDelete = async (chatId) => {
     setShowProfile(true);
     setMenuOpen(false);
   };
+
+  
+  const userFullName =  user ? user.name : "User"; 
+  const userFirstName = userFullName.split(" ")[0]; 
+  const userInitials = userFullName
+    .split(" ")
+    .map((name) => name[0])
+    .join(""); 
 
   return (
     <div className={`${styles.app} ${styles[theme]}`}>
@@ -564,86 +496,118 @@ const handleDelete = async (chatId) => {
           </div>
         )}
         <div className={styles.mainChat}>
-                  {showWelcomeMessage && (
+          {showWelcomeMessage && (
             <div className={styles.welcomeMessage}>
               <strong>Welcome {userFirstName}, chat with Brain</strong>
             </div>
           )}
           <div className={styles.messages}>
-          {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={
-                  msg.sender === "User" ? styles.userMessage : styles.assistantMessage}
-              >
-                 {/* Edit Button for User Messages */}
-                 {msg.sender === "User" && (
-                  <button
-                    className={styles.editButton}
-                    onClick={() => handleEditClick(index, msg.content)}
-                    aria-label="Edit message"
-                  >
-                    <span className="material-icons">edit</span>
-                  </button>
-                )}
-                {editingIndex === index ? (
-                <div className={styles.editMessageContainer}>
-                <textarea
-                  className={styles.editInput}
-                  value={editedMessage}
-                  onChange={(e) => setEditedMessage(e.target.value)}
-                  rows="2"
-                  style={{ resize: "none", overflowY: "auto"}} 
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault(); // Prevent adding a new line
-                      handleSaveEdit(e); // Call the submit handler
-                    }
-                  }}
-                  onInput={(e) => {
-                    e.target.style.height = "auto"; 
-                    const maxHeight = 400;
-                    e.target.style.height = `${Math.min(e.target.scrollHeight, maxHeight)}px`;
-                    //Dynamically adjust
-                  }}
-                />
-                <button
-                  className={styles.saveEditButton}
-                  onClick={() => handleSaveEdit(index)}
-                >
-                  Send
-                </button>
-                <button
-                  className={styles.cancelEditButton}
-                  onClick={() => setEditingIndex(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <>
-                <ReactMarkdown>
-                  {typeof msg?.content === "string" ? DOMPurify.sanitize(msg.content) : ""}
-                </ReactMarkdown>
-                {msg.sender === "Brain" && (
-                  <button
-                    className={styles.copyButton}
-                    onClick={() => handleCopy(msg.content, index)}
-                    aria-label="Copy message"
-                  >
-                    <span className="material-icons">
-                      {copiedIndex == index ? "check_circle" : "content_copy"}
-                    </span>
-                  </button>
-                )}
-                {copiedIndex == index && (
-                  <div className={styles.copiedMessage}>Copied!</div>
-                )}
-                
-                </>
-              )}
-              </div>
-            ))}
+          {messages.map((msg, index) => {
+                  // Build the version history for the message.
+                  const history = getMessageHistory(msg);
+                  // Determine the current version index for this message.
+                  const currentVersionIndex = versionIndices[msg.id] !== undefined 
+                    ? versionIndices[msg.id] 
+                    : history.length - 1;
+                  // Get the content to display based on the version index.
+                  const displayedContent = history[currentVersionIndex];
+
+                  return (
+                    <div
+                      key={index}
+                      className={ msg.sender === "User" ? styles.userMessage : styles.assistantMessage }
+                    >
+                      {msg.sender === "User" && (
+                        // Show edit button if not currently editing this message.
+                        editingIndex !== index && (
+                          <button
+                            className={styles.editButton}
+                            onClick={() => handleEditClick(index, msg.content)}
+                            aria-label="Edit message"
+                          >
+                            <span className="material-icons">edit</span>
+                          </button>
+                        )
+                      )}
+                      {editingIndex === index ? (
+                        // Render editing UI for the message.
+                        <div className={styles.editMessageContainer}>
+                          <textarea
+                            className={styles.editInput}
+                            value={editedMessage}
+                            onChange={(e) => setEditedMessage(e.target.value)}
+                            rows="2"
+                            style={{ resize: "none", overflowY: "auto" }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSaveEdit(index);
+                              }
+                            }}
+                          />
+                          <button
+                            className={styles.saveEditButton}
+                            onClick={() => handleSaveEdit(index)}
+                          >
+                            Send
+                          </button>
+                          <button
+                            className={styles.cancelEditButton}
+                            onClick={() => setEditingIndex(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className={styles.messageContent}>
+                            <ReactMarkdown>
+                              {typeof displayedContent === "string" ? DOMPurify.sanitize(displayedContent) : ""}
+                            </ReactMarkdown>
+                            {history.length > 1 && (
+                              <div className={styles.versionNavigation}>
+                              <button 
+                                onClick={() => handleVersionBack(msg.id)}
+                                disabled={currentVersionIndex === 0}
+                                aria-label="Previous version"
+                                className={styles.versionArrow}
+                              >
+                                &lt;
+                              </button>
+                              <span className={styles.versionIndicator}>
+                                {currentVersionIndex + 1} / {history.length}
+                              </span>
+                              <button 
+                                onClick={() => handleVersionForward(msg.id, history.length)}
+                                disabled={currentVersionIndex === history.length - 1}
+                                aria-label="Next version"
+                                className={styles.versionArrow}
+                              >
+                                &gt;
+                              </button>
+                            </div>
+                            
+                            )}
+                          </div>
+                          {msg.sender === "Brain" && (
+                            <button
+                              className={styles.copyButton}
+                              onClick={() => handleCopy(displayedContent, index)}
+                              aria-label="Copy message"
+                            >
+                              <span className="material-icons">
+                                {copiedIndex === index ? "check_circle" : "content_copy"}
+                              </span>
+                            </button>
+                          )}
+                          {copiedIndex === index && (
+                            <div className={styles.copiedMessage}>Copied!</div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
             {loading && (
               <div className={styles.typingIndicator}>
                 Brain is typing...
