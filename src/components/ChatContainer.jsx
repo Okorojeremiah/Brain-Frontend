@@ -121,9 +121,9 @@ const ChatContainer = () => {
   }, []);
 
 
-  const handleTrendsButtonClick = () => {
-    setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
-  };
+  // const handleTrendsButtonClick = () => {
+  //   setShowTrendsPopup(!showTrendsPopup); // Toggle the popup
+  // };
 
   // Function to handle trend selection
   const handleTrendSelection = (trend) => {
@@ -403,14 +403,14 @@ const handleDelete = async (chatId) => {
             >
               Leave Feedback
             </button>
-            <button
+            {/* <button
               ref={trendsButtonRef} 
               onClick={handleTrendsButtonClick}
               className={`${styles.checkTrendsButton} ${showTrendsPopup ? styles.active : ""}`}
               style={{ width: "100%" }}
             >
               Check Trends
-            </button>
+            </button> */}
 
             {/* Trends Popup Menu */}
             {showTrendsPopup && (

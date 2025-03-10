@@ -691,6 +691,7 @@ input:checked + .slider:before {
   display: flex;
 }
 
+
 .chatHistoryItemMenuButton::before {
   content: "⋯";
   font-size: 24px;

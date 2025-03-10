@@ -95,9 +95,22 @@ export const ChatProvider = ({ children }) => {
         chat_id: chatId,
         user_message: userInput,
       });
+
+      const { answer, chat: updatedChat } = response.data;
+
+    // If the backend updated the chat name (e.g. after the first message), update chatHistory immediately.
+    if (updatedChat && updatedChat.name) {
+      setChatHistory((prevHistory) =>
+        prevHistory.map((chat) =>
+          chat.id === chatId ? { ...chat, name: updatedChat.name } : chat
+        )
+      );
+      await fetchHistory()
+    }
+
       const assistantMessage = {
         sender: "Brain",
-        content: response.data?.answer || "No response available.",
+        content: answer || "No response available.",
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
