@@ -1180,72 +1180,64 @@ input:checked + .slider:before {
 }
 
 /* Mobile Responsive Styles */
-@media (max-width: 768px) {
+@media (max-width: 300px) {
+  /* Keep the sidebar visible with same width as PC (or adjust slightly) */
   .chatSidebar {
-    width: 100%;
-    position: fixed;
+    width: var(--chatSidebar-width);  /* e.g. 20% or a fixed value like 300px */
+    position: relative;  /* No longer fixed */
     top: 0;
-    left: -100%;
-    height: 100vh;
-    z-index: 1000;
-    transition: left 0.3s ease;
-    padding: 20px;
-    overflow-y: auto;
+    left: 0;
+    height: auto;      /* Let it grow with content */
+    z-index: auto;
+    transition: none;
+    padding: 10px;     /* Adjust as needed */
+    overflow-y: visible;
     background-color: var(--sidebar-bg);
   }
 
-  .chatSidebar.visible {
-    left: 0;
-  }
-
-  .mainChat {
-    margin-left: 0;
-  }
-
+  /* Header should be visible on mobile */
   .header {
     margin-left: 0;
-    display: none;
+    display: flex;
+    position: relative;  /* Remove fixed positioning if desired */
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    height: 50px;
   }
 
+  /* Main chat section keeps the same padding and layout */
+  .mainChat {
+    margin-left: var(--chatSidebar-width); /* Sidebar occupies the same space */
+    padding: 20px;
+    height: calc(100vh - 50px); /* Adjust for header height if header remains fixed */
+  }
+
+  /* Messages: keep same font-size and padding as PC */
   .messages {
-    padding: 10px;
-    padding-top: 60px;
+    padding: 20px;
+    padding-top: 70px;
+    margin-top: 0;
+    overflow-y: auto;
   }
 
-  .userMessage,
-  .assistantMessage {
-    max-width: 90%;
-    font-size: 14px;
-    color: var(--message-text-color);
-  }
-
+  /* Adjust input styles if needed */
   .input {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .sendButton,
-  .uploadButton {
     font-size: 18px;
-  }
-
-  .welcomeMessage {
-    font-size: 24px;
-    top: 40%;
-  }
-
-  .closeButton {
-    display: block;
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 24px;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    padding: 15px;
+    min-height: 80px;
   }
 }
+
+@media (max-width: 300px) {
+  .chatHistoryItem {
+    max-width: 90%; /* Use a percentage width to adapt to the screen size */
+    margin: 5px auto; /* Center the items */
+    padding: 10px;  /* Adjust padding if needed */
+  }
+}
+
 
 .closeButton,
 .closeButton:hover,
